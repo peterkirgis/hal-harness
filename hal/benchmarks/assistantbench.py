@@ -25,7 +25,8 @@ class AssistantBenchBenchmark(BaseBenchmark):
         """Evaluate agent outputs using Browsergym evaluation"""
         scores = []
         answers = []
-        exact_matches = []
+        successful_tasks = []
+        failed_tasks = []
 
         task_num = 0
 
@@ -43,12 +44,15 @@ class AssistantBenchBenchmark(BaseBenchmark):
                 task_num += 1
                 
                 if agent_answer == gold_answer:
-                    exact_matches.append(1)
+                    successful_tasks.append(task_id)
+                else:
+                    failed_tasks.append(task_id)
         
         return {
              "scores" : scores,
              "answers" : answers,
-            "exact_matches": exact_matches
+            "successful_tasks": successful_tasks,
+            "failed_tasks": failed_tasks
 
         }
             
@@ -58,13 +62,15 @@ class AssistantBenchBenchmark(BaseBenchmark):
 
         average_score = sum(eval_results["scores"]) / len(self.benchmark)
         precision = sum(eval_results["scores"]) / sum(eval_results["answers"]) if sum(eval_results["answers"]) > 0 else 0
-        exact_matches = sum(eval_results["exact_matches"]) / len(self.benchmark)
+        exact_matches = len(eval_results["successful_tasks"]) / len(self.benchmark)
         answer_rate = sum(eval_results["answers"]) / len(self.benchmark)
 
         return {
             "average_score": float(average_score),
             "precision": float(precision),
             "exact_matches": exact_matches,
-            "answer_rate": answer_rate
+            "answer_rate": answer_rate,
+            "successful_tasks": eval_results["successful_tasks"],
+            "failed_tasks": eval_results["failed_tasks"]
 
         }
