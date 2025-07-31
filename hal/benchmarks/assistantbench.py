@@ -32,7 +32,12 @@ class AssistantBenchBenchmark(BaseBenchmark):
         for task_id, agent_answer in agent_output.items():
                 task = self.benchmark.get(task_id)
                 gold_answer = task["answer"]
-                score, has_answer = question_scorer(agent_answer, gold_answer)
+                try:
+                    score, has_answer = question_scorer(agent_answer, gold_answer)
+                except Exception as e:
+                    print(f"Error scoring task {task_id}: {e}")
+                    score = 0
+                    has_answer = 0
                 scores.append(score)
                 answers.append(has_answer)
                 task_num += 1
